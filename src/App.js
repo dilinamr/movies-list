@@ -1,17 +1,17 @@
-
-// import React, { useEffect, useState, useRef } from 'react';
+// import React, { useState, useEffect, useRef } from 'react';
 // import axios from 'axios';
 // import './App.css';
 // import MovieList from './components/MovieList';
 // import SearchBar from './components/SearchBar';
 // import Filter from './components/Filter';
 // import Sort from './components/Sort';
-// import Pagination from './components/Pagination';
-// import MovieDetails from './components/MovieDetails';
+// import MovieDetailsModal from './components/MovieDetailsModal'; // Updated component name
 
 // const API_KEY = '1630c9c952a2eaa8626afbcef10fed4c';
-// const API_URL = 'https://api.themoviedb.org/3/discover/movie';
+// const DISCOVER_API_URL = 'https://api.themoviedb.org/3/discover/movie';
+// const SEARCH_API_URL = 'https://api.themoviedb.org/3/search/movie';
 // const POSTER_BASE_URL = 'https://image.tmdb.org/t/p/w500';
+// const PAGE_SIZE = 20;
 
 // function App() {
 //   const [movies, setMovies] = useState([]);
@@ -21,15 +21,25 @@
 //   const [searchQuery, setSearchQuery] = useState('');
 //   const [currentPage, setCurrentPage] = useState(1);
 //   const [selectedMovie, setSelectedMovie] = useState(null);
+//   const [isModalOpen, setIsModalOpen] = useState(false);
+//   const [loading, setLoading] = useState(false);
 
-//   // Ref for the last movie element
 //   const lastMovieRef = useRef(null);
 
-//   // Fetch movies from TMDB API
 //   useEffect(() => {
 //     const fetchMovies = async () => {
+//       if (loading) return;
+
+//       setLoading(true);
+
 //       try {
-//         const response = await axios.get(API_URL, {
+//         let apiUrl = DISCOVER_API_URL;
+
+//         if (searchQuery) {
+//           apiUrl = SEARCH_API_URL;
+//         }
+
+//         const response = await axios.get(apiUrl, {
 //           params: {
 //             api_key: API_KEY,
 //             sort_by: sortBy,
@@ -38,84 +48,76 @@
 //             page: currentPage,
 //           },
 //         });
+
 //         const moviesData = response.data.results;
-//         setMovies((prevMovies) => [...prevMovies, ...moviesData]);
+
+//         if (searchQuery) {
+//           setFilteredMovies((prevMovies) => [...prevMovies, ...moviesData]);
+//         } else {
+//           setMovies((prevMovies) => [...prevMovies, ...moviesData]);
+//         }
+
+//         setLoading(false);
 //       } catch (error) {
 //         console.error('Error fetching data:', error);
+//         setLoading(false);
 //       }
 //     };
 
 //     fetchMovies();
-//   }, [selectedCategory, sortBy, searchQuery, currentPage]);
+//   }, [selectedCategory, sortBy, searchQuery, currentPage, loading]);
 
-//   // Handle movie tile click to show details
 //   const handleMovieClick = (movie) => {
 //     setSelectedMovie(movie);
+//     setIsModalOpen(true);
 //   };
 
-//   // Handle close details pop-up
-//   const handleCloseDetails = () => {
-//     setSelectedMovie(null);
+//   const handleCloseModal = () => {
+//     setIsModalOpen(false);
 //   };
 
-//   // Handle category filter change
 //   const handleCategoryChange = (newCategory) => {
 //     setSelectedCategory(newCategory);
-//     setCurrentPage(1); // Reset page when category changes
-//     setMovies([]); // Clear existing movies
+//     setCurrentPage(1);
+//     setMovies([]);
+//     setFilteredMovies([]);
 //   };
 
-//   // Handle sorting change
 //   const handleSortChange = (newSortOption) => {
 //     setSortBy(newSortOption);
-//     setCurrentPage(1); // Reset page when sorting changes
-//     setMovies([]); // Clear existing movies
+//     setCurrentPage(1);
+//     setMovies([]);
+//     setFilteredMovies([]);
 //   };
 
-//   // Handle search
 //   const handleSearch = (query) => {
 //     setSearchQuery(query);
-//     setCurrentPage(1); // Reset page when searching
-//     setMovies([]); // Clear existing movies
+//     setCurrentPage(1);
+//     setMovies([]);
+//     setFilteredMovies([]);
 //   };
 
-//   // Intersection Observer callback for infinite scrolling
-//   const observerCallback = (entries) => {
-//     if (entries[0].isIntersecting && currentPage < totalPages) {
-//       // If the last movie element is intersecting the viewport and there are more pages to load
-//       setCurrentPage(currentPage + 1);
+//   const handleIntersection = (entries) => {
+//     if (entries[0].isIntersecting && !loading) {
+//       setCurrentPage((prevPage) => prevPage + 1);
 //     }
 //   };
 
-//   // Create an Intersection Observer
-//   const observer = new IntersectionObserver(observerCallback, {
-//     root: null, // Use the viewport as the root
-//     rootMargin: '0px', // No margin
-//     threshold: 1.0, // Fully visible
-//   });
-
-//   // Observe the last movie element
 //   useEffect(() => {
 //     if (lastMovieRef.current) {
+//       const observer = new IntersectionObserver(handleIntersection, {
+//         root: null,
+//         rootMargin: '0px',
+//         threshold: 1.0,
+//       });
 //       observer.observe(lastMovieRef.current);
-//     }
 
-//     // Cleanup when component unmounts
-//     return () => {
-//       if (lastMovieRef.current) {
+//       return () => {
 //         observer.unobserve(lastMovieRef.current);
-//       }
-//     };
-//   }, [currentPage]);
+//       };
+//     }
+//   }, [lastMovieRef]);
 
-//   // Calculate the movies to display on the current page
-//   const moviesPerPage = 16;
-//   const indexOfLastMovie = currentPage * moviesPerPage;
-//   const indexOfFirstMovie = indexOfLastMovie - moviesPerPage;
-//   const currentMovies = movies.slice(indexOfFirstMovie, indexOfLastMovie);
-//   const totalPages = Math.ceil(filteredMovies.length / moviesPerPage);
-
-  
 //   return (
 //     <div className="app">
 //       <h1 className="app-title">Movie Listing App</h1>
@@ -125,20 +127,15 @@
 //         <Sort onSortChange={handleSortChange} />
 //       </div>
 //       <MovieList
-//         movies={currentMovies}
+//         movies={searchQuery ? filteredMovies : movies}
 //         onMovieClick={handleMovieClick}
-//         lastMovieRef={lastMovieRef} // Pass the ref to the MovieList component
+//         lastMovieRef={lastMovieRef}
 //       />
-//       <Pagination
-//         currentPage={currentPage}
-//         totalPages={totalPages}
-//         setCurrentPage={setCurrentPage}
-//       />
-//       {selectedMovie && (
-//         <MovieDetails
+//       {isModalOpen && selectedMovie && (
+//         <MovieDetailsModal // Updated component name
+//           isOpen={isModalOpen}
+//           onClose={handleCloseModal}
 //           movie={selectedMovie}
-//           posterBaseUrl={POSTER_BASE_URL}
-//           onClose={handleCloseDetails}
 //         />
 //       )}
 //     </div>
@@ -147,125 +144,117 @@
 
 // export default App;
 
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import "./App.css";
+import MovieList from "./components/MovieList";
+import SearchBar from "./components/SearchBar";
+import Filter from "./components/Filter";
+import Sort from "./components/Sort";
+import MovieDetailsModal from "./components/MovieDetailsModal";
 
-
-
-
-import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
-import './App.css';
-import MovieList from './components/MovieList';
-import SearchBar from './components/SearchBar';
-import Filter from './components/Filter';
-import Sort from './components/Sort';
-import Pagination from './components/Pagination';
-import MovieDetails from './components/MovieDetails';
-
-const API_KEY = '1630c9c952a2eaa8626afbcef10fed4c';
-const API_URL = 'https://api.themoviedb.org/3/discover/movie';
-const POSTER_BASE_URL = 'https://image.tmdb.org/t/p/w500';
+const API_KEY = "1630c9c952a2eaa8626afbcef10fed4c";
+const DISCOVER_API_URL = "https://api.themoviedb.org/3/discover/movie";
+const SEARCH_API_URL = "https://api.themoviedb.org/3/search/movie";
+const POSTER_BASE_URL = "https://image.tmdb.org/t/p/w500";
+const PAGE_SIZE = 20;
 
 function App() {
   const [movies, setMovies] = useState([]);
   const [filteredMovies, setFilteredMovies] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [sortBy, setSortBy] = useState('popularity.desc');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [sortBy, setSortBy] = useState("popularity.desc");
+  const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedMovie, setSelectedMovie] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Ref for the last movie element
   const lastMovieRef = useRef(null);
 
-  // Fetch movies from TMDB API
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const response = await axios.get(API_URL, {
+        let apiUrl = DISCOVER_API_URL;
+
+        if (searchQuery) {
+          apiUrl = SEARCH_API_URL;
+        }
+
+        const response = await axios.get(apiUrl, {
           params: {
             api_key: API_KEY,
             sort_by: sortBy,
-            with_genres: selectedCategory === 'all' ? '' : selectedCategory,
+            with_genres: selectedCategory === "all" ? "" : selectedCategory,
             query: searchQuery,
             page: currentPage,
           },
         });
+
         const moviesData = response.data.results;
-        setMovies((prevMovies) => [...prevMovies, ...moviesData]);
+
+        if (searchQuery) {
+          setFilteredMovies((prevMovies) => [...prevMovies, ...moviesData]);
+        } else {
+          setMovies((prevMovies) => [...prevMovies, ...moviesData]);
+        }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       }
     };
 
     fetchMovies();
   }, [selectedCategory, sortBy, searchQuery, currentPage]);
 
-  // Handle movie tile click to show details
   const handleMovieClick = (movie) => {
     setSelectedMovie(movie);
+    setIsModalOpen(true);
   };
 
-  // Handle close details pop-up
-  const handleCloseDetails = () => {
-    setSelectedMovie(null);
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
   };
 
-  // Handle category filter change
   const handleCategoryChange = (newCategory) => {
     setSelectedCategory(newCategory);
-    setCurrentPage(1); // Reset page when category changes
-    setMovies([]); // Clear existing movies
+    setCurrentPage(1);
+    setMovies([]);
+    setFilteredMovies([]);
   };
 
-  // Handle sorting change
   const handleSortChange = (newSortOption) => {
     setSortBy(newSortOption);
-    setCurrentPage(1); // Reset page when sorting changes
-    setMovies([]); // Clear existing movies
+    setCurrentPage(1);
+    setMovies([]);
+    setFilteredMovies([]);
   };
 
-  // Handle search
   const handleSearch = (query) => {
     setSearchQuery(query);
-    setCurrentPage(1); // Reset page when searching
-    setMovies([]); // Clear existing movies
+    setCurrentPage(1);
+    setMovies([]);
+    setFilteredMovies([]);
   };
 
-  // Intersection Observer callback for infinite scrolling
-  const observerCallback = (entries) => {
-    if (entries[0].isIntersecting && currentPage < totalPages) {
-      // If the last movie element is intersecting the viewport and there are more pages to load
-      setCurrentPage(currentPage + 1);
+  const handleIntersection = (entries) => {
+    if (entries[0].isIntersecting) {
+      setCurrentPage((prevPage) => prevPage + 1);
     }
   };
 
-  // Create an Intersection Observer
-  const observer = new IntersectionObserver(observerCallback, {
-    root: null, // Use the viewport as the root
-    rootMargin: '0px', // No margin
-    threshold: 1.0, // Fully visible
-  });
-
-  // Observe the last movie element
   useEffect(() => {
     if (lastMovieRef.current) {
+      const observer = new IntersectionObserver(handleIntersection, {
+        root: null,
+        rootMargin: "0px",
+        threshold: 1.0,
+      });
       observer.observe(lastMovieRef.current);
-    }
 
-    // Cleanup when component unmounts
-    return () => {
-      if (lastMovieRef.current) {
+      return () => {
         observer.unobserve(lastMovieRef.current);
-      }
-    };
-  }, [currentPage]);
-
-  // Calculate the movies to display on the current page
-  const moviesPerPage = 16;
-  const indexOfLastMovie = currentPage * moviesPerPage;
-  const indexOfFirstMovie = indexOfLastMovie - moviesPerPage;
-  const currentMovies = movies.slice(indexOfFirstMovie, indexOfLastMovie);
-  const totalPages = Math.ceil(filteredMovies.length / moviesPerPage);
+      };
+    }
+  }, [lastMovieRef]);
 
   return (
     <div className="app">
@@ -276,20 +265,15 @@ function App() {
         <Sort onSortChange={handleSortChange} />
       </div>
       <MovieList
-        movies={currentMovies}
+        movies={searchQuery ? filteredMovies : movies}
         onMovieClick={handleMovieClick}
-        lastMovieRef={lastMovieRef} // Pass the ref to the MovieList component
+        lastMovieRef={lastMovieRef}
       />
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        setCurrentPage={setCurrentPage}
-      />
-      {selectedMovie && (
-        <MovieDetails
+      {isModalOpen && selectedMovie && (
+        <MovieDetailsModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
           movie={selectedMovie}
-          posterBaseUrl={POSTER_BASE_URL}
-          onClose={handleCloseDetails}
         />
       )}
     </div>

@@ -14,7 +14,6 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
- 
 }
 @media screen and (max-width: 550px) {
   .filter-sort {
@@ -42,7 +41,6 @@ select {
   outline: none;
   cursor: pointer;
 }
-
 
 /* MovieCard.css (You can create a separate CSS file for the MovieCard component) */
 
@@ -77,8 +75,6 @@ select {
   font-size: 1rem;
   color: #666;
 }
-
-
 
 /* MovieDetails.css (You can create a separate CSS file for the MovieDetails component) */
 
@@ -139,8 +135,6 @@ select {
 
 /* Adjust the styles as needed to match your design and layout preferences. */
 
-
-
 /* MovieList.css (You can create a separate CSS file for the MovieList component) */
 
 .movie-list {
@@ -158,9 +152,6 @@ select {
 }
 
 /* Adjust the styles as needed to match your design and layout preferences. */
-
-
-
 
 /* Pagination.css (You can create a separate CSS file for the Pagination component) */
 
@@ -187,7 +178,6 @@ select {
 .pagination-buttons button.active {
   background-color: #555;
 }
-
 
 /* SearchBar.css (You can create a separate CSS file for the SearchBar component) */
 
@@ -218,7 +208,6 @@ select {
   background-color: #0056b3;
 }
 
-
 /* Sort.css (You can create a separate CSS file for the Sort component) */
 
 .sort {
@@ -235,4 +224,69 @@ select {
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 5px;
+}
+
+
+/* MovieDetailsModal.css */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal.open {
+  display: flex;
+}
+
+.modal-content {
+  background-color: white;
+  width: 900px; /* Set the width to 900px */
+  max-height: 850px; /* Set the maximum height to 850px */
+  overflow-y: auto; /* Enable scrolling for content if it exceeds 850px in height */
+  padding: 20px;
+  border-radius: 6px; /* Increased border radius for a rounded appearance */
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+  text-align: center; /* Center-align the content */
+}
+
+.modal-content h2 {
+  text-align: center;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  color: #333;
+}
+
+.close-button:focus {
+  outline: none; /* Remove focus outline */
+}
+
+.modalimg {
+  margin: 0 auto; /* Center the image horizontally */
+  height: 400px;
+  border-radius: 6px;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px,
+    rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px,
+    rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+}
+
+.movie-details {
+  margin: 0 auto;
+  text-align: center; /* Left-align the movie details */
+  max-width: 80%; /* Limit the width of the movie details */
 }
