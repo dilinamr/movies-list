@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 const categories = [
-  { id: 'all', name: 'All' },
-  { id: '28', name: 'Action' },
-  { id: '35', name: 'Comedy' },
-  { id: '18', name: 'Drama' },
+  { id: "all", name: "All" },
+  { id: "28", name: "Action" },
+  { id: "35", name: "Comedy" },
+  { id: "18", name: "Drama" },
   // Add more categories as needed
 ];
 
 function Filter({ onCategoryChange }) {
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
   const handleCategoryChange = (event) => {
     const newCategory = event.target.value;

@@ -226,7 +226,6 @@ select {
   border-radius: 5px;
 }
 
-
 /* MovieDetailsModal.css */
 .modal {
   display: none;
@@ -289,4 +288,21 @@ select {
   margin: 0 auto;
   text-align: center; /* Left-align the movie details */
   max-width: 80%; /* Limit the width of the movie details */
+}
+
+/* CSS for Mobile Version */
+@media (max-width: 500px) {
+  .modal-content {
+    width: 90%; /* Adjust the width to fit smaller screens */
+    max-height: 100%; /* Adjust the maximum height for smaller screens */
+  }
+
+  .modalimg {
+    width: 100%; /* Adjust the image to occupy the full width of the modal */
+    height: auto; /* Allow the image to resize based on its aspect ratio */
+  }
+
+  .movie-details {
+    max-width: 100%; /* Allow the movie details to occupy the full width */
+  }
 }

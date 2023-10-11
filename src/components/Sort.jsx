@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 const sortingOptions = [
-  { id: 'popularity.desc', label: 'Popularity Descending' },
-  { id: 'popularity.asc', label: 'Popularity Ascending' },
-  { id: 'vote_average.desc', label: 'Rating Descending' },
-  { id: 'vote_average.asc', label: 'Rating Ascending' },
+  { id: "popularity.desc", label: "Popularity Descending" },
+  { id: "popularity.asc", label: "Popularity Ascending" },
+  { id: "vote_average.desc", label: "Rating Descending" },
+  { id: "vote_average.asc", label: "Rating Ascending" },
 ];
 
 function Sort({ onSortChange }) {
-  const [selectedSortOption, setSelectedSortOption] = useState('popularity.desc');
+  const [selectedSortOption, setSelectedSortOption] =
+    useState("popularity.desc");
 
   const handleSortChange = (event) => {
     const newSortOption = event.target.value;
@@ -19,11 +20,7 @@ function Sort({ onSortChange }) {
   return (
     <div className="sort">
       <label htmlFor="sort">Sort by:</label>
-      <select
-        id="sort"
-        value={selectedSortOption}
-        onChange={handleSortChange}
-      >
+      <select id="sort" value={selectedSortOption} onChange={handleSortChange}>
         {sortingOptions.map((option) => (
           <option key={option.id} value={option.id}>
             {option.label}
